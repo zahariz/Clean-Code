@@ -10,107 +10,37 @@ permissions:
   contents: read
 
 jobs:
-  # -------------------------------------------------------------
-  # Job 1: Code Style & Formatting (Composer Lint / Laravel Pint)
-  # -------------------------------------------------------------
-  lint:
-    name: 🎨 Composer Lint (Pint)
+  ci:
+    name: 🚀 All-in-One CI Checks
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          tools: composer:v2
-
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Run Pint (Lint Check)
-        run: composer lint:check
-
-  # -------------------------------------------------------------
-  # Job 2: Static Analysis (Composer Stan / PHPStan / Larastan)
-  # -------------------------------------------------------------
-  stan:
-    name: 🔍 Composer Stan (PHPStan)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          tools: composer:v2
-
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Run PHPStan (Static Analysis)
-        run: composer types:check
-
-  # -------------------------------------------------------------
-  # Job 3: CVE Security Vulnerability Check (Composer Audit)
-  # -------------------------------------------------------------
-  cve-audit:
-    name: 🛡️ CVE Security Audit (Composer Audit)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          tools: composer:v2
-
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Run Security Audit (CVE Check)
-        run: composer cve:check
-
-  # -------------------------------------------------------------
-  # Job 4: Automated Unit & Feature Tests
-  # -------------------------------------------------------------
-  unit-tests:
-    name: 🧪 Unit & Feature Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
+      - name: 🐘 Setup PHP & Extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           extensions: mbstring, dom, fileinfo, sqlite3
           tools: composer:v2
 
-      - name: Copy .env.example
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: ⚙️ Setup Application Environment
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          composer install --prefer-dist --no-interaction --no-progress
+          php artisan key:generate
+          touch database/database.sqlite
+          php artisan migrate --graceful --ansi
 
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: 🎨 1. Composer Lint (Laravel Pint)
+        run: composer lint:check
 
-      - name: Generate Application Key
-        run: php artisan key:generate
+      - name: 🔍 2. Composer Stan (PHPStan)
+        run: composer types:check
 
-      - name: Create SQLite Database
-        run: touch database/database.sqlite
+      - name: 🛡️ 3. CVE Security Audit (Composer Audit)
+        run: composer cve:check
 
-      - name: Run Migrations
-        run: php artisan migrate --graceful --ansi
-
-      - name: Run Unit & Feature Tests
+      - name: 🧪 4. Unit & Feature Tests
         run: composer test:unit

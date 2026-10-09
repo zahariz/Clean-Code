@@ -1,41 +1,26 @@
 image: php:8.3-cli
 
 stages:
-  - quality
-  - security
-  - test
+  - ci
 
 cache:
   paths:
     - vendor/
 
-before_script:
-  - apt-get update -yqq
-  - apt-get install -yqq git unzip libsqlite3-dev
-  - docker-php-ext-install pdo_sqlite
-  - curl -sS https://getcomposer.org/installer | php
-  - php composer.phar install --prefer-dist --no-interaction
-
-lint_check:
-  stage: quality
-  script:
-    - php composer.phar lint:check
-
-stan_check:
-  stage: quality
-  script:
-    - php composer.phar types:check
-
-cve_audit:
-  stage: security
-  script:
-    - php composer.phar cve:check
-
-unit_test:
-  stage: test
-  script:
+all_ci_checks:
+  stage: ci
+  before_script:
+    - apt-get update -yqq
+    - apt-get install -yqq git unzip libsqlite3-dev
+    - docker-php-ext-install pdo_sqlite
+    - curl -sS https://getcomposer.org/installer | php
+    - php composer.phar install --prefer-dist --no-interaction
     - cp .env.example .env
     - php artisan key:generate
     - touch database/database.sqlite
     - php artisan migrate --graceful
+  script:
+    - php composer.phar lint:check
+    - php composer.phar types:check
+    - php composer.phar cve:check
     - php artisan test
