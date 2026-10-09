@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Demo - Order List Dashboard</title>
+    <title>Live Demo - Order List Dashboard (Dirty Code)</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-8">
@@ -31,7 +31,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($orders as $item)
+                    @foreach($d as $item)
                         <tr class="border-b hover:bg-gray-50 text-sm">
                             <td class="p-3 font-semibold text-gray-700">#ORD-{{ $item['id'] }}</td>
                             <td class="p-3 text-gray-800">{{ $item['customer'] }}</td>
@@ -44,12 +44,6 @@
                 </tbody>
             </table>
         </div>
-
-        @if(method_exists($orders, 'links'))
-            <div class="mt-4">
-                {{ $orders->links() }}
-            </div>
-        @endif
     </div>
 </body>
 </html>

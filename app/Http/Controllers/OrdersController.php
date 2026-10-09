@@ -7,7 +7,7 @@ use App\Services\DiscountService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class OrdersController extends Controller
 {
     public function index(Request $request): View
     {
