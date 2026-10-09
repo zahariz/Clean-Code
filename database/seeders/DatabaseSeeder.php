@@ -13,12 +13,12 @@ class DatabaseSeeder extends Seeder
     {
         $products = ['Laptop Gaming', 'Wireless Mouse', 'Mechanical Keyboard', 'Monitor 27 inch', 'Headset Bluetooth', 'USB-C Hub', 'Webcam 4K', 'Ergonomic Chair'];
 
+        // Create 50 users
         $users = User::factory(50)->create();
 
+        // Exactly 500 orders total (10 orders per user)
         foreach ($users as $user) {
-            // Create 1-3 orders for each user
-            $orderCount = 1000;
-            for ($i = 0; $i < $orderCount; $i++) {
+            for ($i = 0; $i < 10; $i++) {
                 $order = Order::create([
                     'user_id' => $user->id,
                     'total_amount' => 0,
