@@ -9,19 +9,14 @@ class OrderController extends Controller
 {
     public function index(Request $req)
     {
-        // ❌ N+1 PROBLEM 1: Mengambil semua order tanpa Eager Loading (without 'with')
-        // ❌ BAD CODE 2: Nama variabel ambigu ($x, $o, $res)
         $x = Order::all();
         $res = [];
 
         foreach ($x as $o) {
-            // ❌ N+1 PROBLEM 2: Memanggil relasi user di dalam loop (1 query per order!)
             $uName = $o->user ? $o->user->name : 'Guest';
 
-            // ❌ N+1 PROBLEM 3: Memanggil relasi items di dalam loop (1 query per order!)
             $itemCount = $o->items->count();
 
-            // ❌ BAD CODE 4: Nested If-Else Pyramid & Magic Numbers (1, 2, PAID)
             $stBadge = '';
             if ($o->status == 1) {
                 if ($o->payment_status == 'PAID') {
@@ -41,7 +36,6 @@ class OrderController extends Controller
                 }
             }
 
-            // ❌ BAD CODE 5: Logika kalkulasi diskon dimasukkan langsung ke Controller (Fat Controller)
             $discount = 0;
             if ($req->has('promo') && $req->promo == 'FLASHSALE') {
                 if ($o->total_amount >= 1000000) {

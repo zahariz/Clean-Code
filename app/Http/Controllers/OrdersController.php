@@ -11,12 +11,10 @@ class OrdersController extends Controller
 {
     public function index(Request $request): View
     {
-        // 🚀 1. Eager Loading + Pagination (Mengurangi query & mencegah Memory Exhausted)
         $orders = Order::with(['user', 'items'])
             ->latest()
             ->paginate(500);
 
-        // 🚀 2. Transformasi data per halaman secara efisien
         $orders->getCollection()->transform(function (Order $order) use ($request) {
             $discount = DiscountService::calculate($order->total_amount, $request->query('promo'));
 
@@ -32,7 +30,7 @@ class OrdersController extends Controller
 
         return view('orders.index', [
             'orders' => $orders,
-            'd' => $orders, // Aliasing agar kompatibel dengan Blade
+            'd' => $orders,
         ]);
     }
 }
