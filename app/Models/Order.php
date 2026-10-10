@@ -34,7 +34,7 @@ class Order extends Model
     public function getStatusBadgeAttribute(): string
     {
         return match (true) {
-            $this->status === 1 && $this->payment_status === 'PAID' && $this->total_amount > 500000 => 'VIP Paid',
+            $this->status === 1 && $this->payment_status === 'PAID' && $this->total_amount > 2000000 => 'VIP Paid',
             $this->status === 1 && $this->payment_status === 'PAID' => 'Paid',
             $this->status === 1 => 'Waiting Payment',
             $this->status === 2 => 'Processing',
