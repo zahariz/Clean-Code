@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +18,11 @@ class Order extends Model
         'total_amount',
         'status',
         'payment_status',
+    ];
+
+    protected $casts = [
+        'status' => OrderStatus::class,
+        'payment_status' => PaymentStatus::class,
     ];
 
     /**
@@ -34,10 +41,17 @@ class Order extends Model
     public function getStatusBadgeAttribute(): string
     {
         return match (true) {
-            $this->status === 1 && $this->payment_status === 'PAID' && $this->total_amount > 2000000 => 'VIP Paid',
-            $this->status === 1 && $this->payment_status === 'PAID' => 'Paid',
-            $this->status === 1 => 'Waiting Payment',
-            $this->status === 2 => 'Processing',
+            $this->status == OrderStatus::DRAFT
+                && $this->payment_status == PaymentStatus::PAID
+                && $this->total_amount > 2000000 => 'VIP Paid',
+
+            $this->status == OrderStatus::DRAFT
+                && $this->payment_status == PaymentStatus::PAID => 'Paid',
+
+            $this->status == OrderStatus::DRAFT => 'Waiting Payment',
+
+            $this->status == OrderStatus::PROCESSING => 'Processing',
+
             default => 'Cancelled',
         };
     }

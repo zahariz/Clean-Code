@@ -11,8 +11,9 @@ class OrderController extends Controller
 {
     public function index(Request $request): View
     {
-        $orders = Order::with(['user', 'items'])->latest()
-    ->paginate(500);
+        $orders = Order::with(['user', 'items'])
+            ->latest()
+            ->paginate(500);
 
         $orders->getCollection()->transform(function (Order $order) use ($request) {
             $discount = DiscountService::calculate($order->total_amount, $request->promo);
